@@ -1,0 +1,87 @@
+!/bin/bash
+
+#Auth: aarok
+#Desc: Automated docker image creation
+#Date.04/20/2021
+
+echo -e "\nAre you working on centos or ubuntu\n?"
+read flav
+
+
+if [ ${flav} = centos ]
+then
+  yum install docker -y
+fi
+
+if [ ${flav} = ubuntu ]
+then
+   apt-get install docker -y
+fi
+
+if [ ${flav} = alpine ]
+then
+   apk add docker -y
+fi
+
+echo -e "\nWhat is your name please?\n"
+read name
+
+
+echo -e "\nWhat base image do you prefer? (centos, ubuntu, alpine)\n"
+read base
+
+
+echo -e "\nWhat version of the image selected above do you want? (i.e latest, 1.0, 2.0 etc)\n"
+read v
+
+
+echo -e "\nWhat name would you like for a copy of this container on your system?\n"
+read vol
+
+echo -e "\nDo you want a port exposed? Which one please?(numbers only)ln"
+read p
+
+echo -e "\nWhat programs or applications do you want installed? (httpd alpine wget curl finger)\n"
+read app
+
+
+echo -e "What is the name of that file or directory you want to copy into the image? NB: Please make sure that you are running this script in the same directory where that file or folder is found\n"
+read c
+
+
+if [ ${base} = centos ]
+then
+echo -e "Building a ${base} image, version ${v} with port ${p} opened and installing ${app} .\n"
+
+echo -e "FROM ${base}:${v}\nMAINTAINER ${name}\nRUN yum update -y\nRUN yum install ${app} -y\nRUN systemctl enable httpd\nCOPY ./${c} /var/www/html\nEXPOSE ${p}\nCMD apachectl -D FOREGROUND" > dockerfile
+fi
+
+if [ ${base} = ubuntu ]
+then
+echo -e "Building a ${base} image, version ${v} with port ${p} opened and installing ${app} .\n"
+
+echo -e "FROM ${base}:${v}\nMAINTAINER ${name}\nRUN yum update -y\nRUN yum install ${app} -y\nRUN systemctl enable httpd\nCOPY ./${c} /var/www/html\nEXPOSE ${p}\nCMD apachectl -D FOREGROUND" > dockerfile
+fi
+
+if [ ${base} = alpine ]
+then
+echo -e "Building a ${base} image, version ${v} with port ${p} opened and installing {$app} .\n"
+
+echo -e "FROM ${base}:${v}\nMAINTAINER ${name}\nRUN yum update -y\nRUN yum install ${app} -y\nRUN systemctl enable httpd\nCOPY ./${c} /var/www/html\nEXPOSE ${p}\nCMD apachectl -D FOREGROUND" > dockerfile
+fi
+
+
+docker build -t ${name}/${base}_httpd .
+
+#docker run -itv ${v}:/var/www/html -p 100 ${name}/${base}_httpd bash
+
+if [ $? = 0 ]
+then
+echo "Created successfully"
+
+echo "Finito"
+
+else
+echo "no bueno"
+fi
+
