@@ -79,6 +79,8 @@ if [ $? = 0 ]
 then
 echo "Created successfully"
 
+rm -rf dockerfile
+
 echo "Finito"
 
 else
