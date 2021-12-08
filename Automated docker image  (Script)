@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 #Auth: aarok
 #Desc: Automated docker image creation
